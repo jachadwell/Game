@@ -1,17 +1,14 @@
 import questManager from "@/game/Classes/QuestManager";
 import { EventBus } from "@/game/EventBus";
+import { TQuest } from "@/game/Types/types";
 
 export type Props = {
     dialog: string;
-    hasReadyQuest: boolean;
-    readyQuestId?: string | null;
-    hasCompleteQuest: boolean;
+    readyQuest: TQuest | null;
+    completeQuest: TQuest | null;
 }
 
-export default function Dialog({ dialog, hasReadyQuest, readyQuestId, hasCompleteQuest }: Props) {
-
-    console.log("hasReadyQuest:", hasReadyQuest);
-    console.log("readyQuestId:", readyQuestId)
+export default function Dialog({ dialog, completeQuest, readyQuest }: Props) {
 
     return (<div style={{
         width: "80%",
@@ -23,15 +20,15 @@ export default function Dialog({ dialog, hasReadyQuest, readyQuestId, hasComplet
         border: "1px solid white",
     }}>
         <p>{dialog}</p>
-        {hasReadyQuest && readyQuestId && (
+        {readyQuest && (
             <button onClick={() => {
-                questManager.acceptQuest(readyQuestId)
+                questManager.acceptQuest(readyQuest.id)
                 EventBus.emit("toggle-dialog-off")
             }}>Accept Quest</button>
         )}
-        {hasCompleteQuest && (
+        {completeQuest && (
             <button onClick={() => {
-                questManager.completeQuest("1")
+                questManager.completeQuest(completeQuest.id)
                 EventBus.emit("toggle-dialog-off")
             }}>Complete Quest</button>
         )}

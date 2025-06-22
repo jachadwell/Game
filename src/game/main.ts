@@ -1,18 +1,16 @@
 import { AUTO, Game } from 'phaser';
 import store from '../store';
 
-const sceneModules = import.meta.glob('./Scenes/*.ts', { eager: true });
+const sceneModules: any = import.meta.glob("./Scenes/*.ts", { eager: true });
 const scenes = Object.values(sceneModules).map((module: any) => module.default);
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
-    // width: "97%",
     width: "100%",
     height: "100%",
     parent: 'game-container',
-    // backgroundColor: '#080E16',
     scene: scenes,
     callbacks: {
         preBoot: (game) => {

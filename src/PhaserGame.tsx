@@ -5,6 +5,7 @@ import Inventory from './components/Inventory';
 import ObjectInventory from './components/ObjectInventory';
 import Dialog from './components/Dialog';
 import QuestLog from './components/QuestLog';
+import { TQuest } from './game/Types/types';
 
 export interface IRefPhaserGame {
     game: Phaser.Game | null;
@@ -21,9 +22,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
     const [showInventory, setShowInventory] = useState<boolean>(false);
     const [showDialog, setShowDialog] = useState<boolean>(false);
     const [dialog, setDialog] = useState<string>("");
-    const [hasReadyQuest, setHasReadyQuest] = useState<boolean>(false);
-    const [readyQuestId, setReadyQuestId] = useState<string | null>(null);
-    const [hasCompleteQuest, setHasCompleteQuest] = useState<boolean>(false);
+    const [readyQuest, setReadyQuest] = useState<TQuest | null>(null);
+    const [completeQuest, setCompleteQuest] = useState<TQuest | null>(null);
 
     useLayoutEffect(() => {
         if (game.current === null) {
@@ -77,17 +77,16 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
     })
 
     useEffect(() => {
-        const toggleDialog = (data: { dialog?: string, hasReadyQuest?: boolean, readyQuestId?: string | undefined, hasCompleteQuest?: boolean }) => {
+        const toggleDialog = (data: { dialog?: string, completeQuest: TQuest | null, readyQuest: TQuest | null }) => {
             setShowDialog((showDialog) => !showDialog)
             setDialog(data.dialog ?? "")
-            setHasReadyQuest(data.hasReadyQuest ?? false)
-            setHasCompleteQuest(data.hasCompleteQuest ?? false);
-            setReadyQuestId(data.readyQuestId ?? null)
+            setReadyQuest(data.readyQuest ?? null);
+            setCompleteQuest(data.completeQuest ?? null);
         }
         const toggleDialogOff = () => {
             setShowDialog(false);
-            setHasReadyQuest(false);
-            setHasCompleteQuest(false);
+            setReadyQuest(null);
+            setCompleteQuest(null);
         };
         EventBus.on("toggle-dialog", toggleDialog)
         EventBus.on('toggle-dialog-off', toggleDialogOff)
@@ -106,9 +105,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame
             {showDialog && (
                 <Dialog
                     dialog={dialog}
-                    hasReadyQuest={hasReadyQuest}
-                    readyQuestId={readyQuestId}
-                    hasCompleteQuest={hasCompleteQuest}
+                    completeQuest={completeQuest}
+                    readyQuest={readyQuest}
                 />
             )}
             <ObjectInventory />

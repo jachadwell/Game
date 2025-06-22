@@ -46,6 +46,7 @@ export default function ObjectInventory() {
                 onClick={() => {
                     store.dispatch({ type: "world/removeObjectInventoryItem", payload: { id: id, removeItem: item.name } })
                     store.dispatch({ type: "player/addToInventory", payload: item })
+                    // Remove object from ui display because we took it
                     setItems((items) => items.filter((itm) => itm.name !== item.name))
                 }}
                 sx={{

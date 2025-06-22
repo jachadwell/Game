@@ -16,7 +16,6 @@ export class SceneLoader {
     private store: Store;
     private collisionLayer: Phaser.Tilemaps.TilemapLayer | null;
     private player: Player;
-    // private keystrokes: TKeyMapping | undefined
 
     constructor(data: SceneLoaderProps) {
         this.scene = data.scene;
@@ -296,6 +295,13 @@ export class SceneLoader {
                     this.scene.input.setDefaultCursor("default");
                 });
         });
+
+        setTimeout(() => {
+            console.log("Launching scene!");
+            this.scene.scene.pause()
+            this.scene.scene.launch('Arena');
+            this.scene.scene.bringToTop('Arena');
+        }, 3000);
     }
 }
 

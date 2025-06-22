@@ -1,6 +1,6 @@
 
 
-export type TMapNames = 'basic-house' | 'basic-house-one-interrior' | 'basic-house-two-interrior';
+export type TMapNames = 'basic-house' | 'basic-house-one-interrior' | 'basic-house-two-interrior' | 'arena';
 
 export type TKeyMapping = {
     W: Phaser.Input.Keyboard.Key,

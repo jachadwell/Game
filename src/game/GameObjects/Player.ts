@@ -7,6 +7,7 @@ type PlayerConfig = {
     x: number;
     y: number;
     frame?: number;
+    disableMovement?: boolean
 }
 
 type KeyMapping = {
@@ -20,10 +21,19 @@ type KeyMapping = {
 export class Player extends Phaser.Physics.Arcade.Sprite {
     private cursors;
     private keystrokes: KeyMapping | undefined
+    public stats: {
+        damage: number;
+    }
+    private disableMovement: boolean;
 
     constructor(config: PlayerConfig) {
         const { scene } = config
         super(scene, config.x, config.y, 'dude');
+
+        this.stats = {
+            damage: 1
+        }
+        this.disableMovement = config.disableMovement ?? false;
 
         this.cursors = scene.input.keyboard?.createCursorKeys();
         this.keystrokes = scene.input.keyboard?.addKeys('W,S,A,D,TAB') as KeyMapping;
@@ -47,18 +57,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         scene.input?.keyboard?.on('keydown', () => {
             EventBus.emit("toggle-dialog-off")
         })
-
-        // Attack logic
-        scene.input.on('gameobjectdown', (pointer: any, gameObject: any) => {
-            if (Phaser.Math.Distance.Between(this.x, this.y, gameObject.x, gameObject.y) > 60) {
-                return;
-            }
-            const enemyId = getObjectCustomPropertyValue(gameObject.gameobject, "enemyId");
-            EventBus.emit(enemyId, 'attack', 1);
-        })
     }
 
     update() {
+        if (!this.disableMovement) {
+            this.handleMovement();
+        }
+    }
+
+    handleMovement() {
         this.setVelocityX(0);
         this.setVelocityY(0);
 
@@ -80,22 +87,21 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
         // Stop the current animation if the player is idle
         if (velocity.x === 0 && velocity.y === 0) {
-            this.play('idle', true); // Replace 'idle' with your idle animation key
+            this.play('idle', true);
         } else {
-            // Determine the direction and play the appropriate animation
             if (Math.abs(velocity.x) > Math.abs(velocity.y)) {
                 // Horizontal movement
                 if (velocity.x > 0) {
-                    this.play('walk-right', true); // Replace with your right-walking animation key
+                    this.play('walk-right', true);
                 } else {
-                    this.play('walk-left', true); // Replace with your left-walking animation key
+                    this.play('walk-left', true);
                 }
             } else {
                 // Vertical movement
                 if (velocity.y > 0) {
-                    this.play('walk-down', true); // Replace with your down-walking animation key
+                    this.play('walk-down', true);
                 } else {
-                    this.play('walk-up', true); // Replace with your up-walking animation key
+                    this.play('walk-up', true);
                 }
             }
         }

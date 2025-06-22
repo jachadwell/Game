@@ -92,33 +92,30 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains)
             .on('pointerdown', () => {
                 const state = store.getState();
-                const hasReadyQuest = selectReadyQuests(state).length > 0;
-                console.log("selectReadyQuests:", selectReadyQuests(state))
-                const readyQuestId = selectReadyQuests(state)[0].id;
-                const hasCompleteQuest = this.hasCompleteQuest(selectActiveQuests(state), selectPlayerInventory(state));
-
-                console.log("hasReadyQuest:", hasReadyQuest);
-                console.log("readyQuestId:", readyQuestId)
+                const readyQuests = selectReadyQuests(state);
+                const completeQuests = this.getCompleteQuests(selectActiveQuests(state), selectPlayerInventory(state));
 
                 const distance = Phaser.Math.Distance.Between(
                     this.x, this.y,
                     player.x, player.y
                 );
-                console.log("distance:", distance)
                 if (distance <= interactionDistance) {
-                    console.log("Adding stick to inventory!")
-                    store.dispatch({ type: "player/addToInventory", payload: { name: "stick" } })
                     EventBus.emit("toggle-dialog",
                         {
                             dialog: config.dialog,
-                            hasReadyQuest: hasReadyQuest,
-                            readyQuestId: readyQuestId,
-                            hasCompleteQuest: hasCompleteQuest
+                            completeQuest: completeQuests[0] ?? null,
+                            readyQuest: readyQuests[0] ?? null
                         })
                 }
             })
             .on('pointerover', () => {
-                scene.input.setDefaultCursor('pointer');
+                const distance = Phaser.Math.Distance.Between(
+                    this.x, this.y,
+                    player.x, player.y
+                );
+                if (distance <= interactionDistance) {
+                    scene.input.setDefaultCursor('pointer');
+                }
             })
             .on('pointerout', () => {
                 scene.input.setDefaultCursor('default');
@@ -150,18 +147,17 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    hasCompleteQuest(activeQuests: any, pInventory: Record<string, TInventoryItem>) {
-        let hasCompleteQuest = false;
+    getCompleteQuests(activeQuests: any, pInventory: Record<string, TInventoryItem>) {
         if (activeQuests.length > 0) {
-            activeQuests.filter((quest: TQuest) => {
+            return activeQuests.filter((quest: TQuest) => {
                 return quest.requirements?.items.every((item) => {
                     if (pInventory[item.name] && pInventory[item.name].quantity >= item.quantity) {
-                        hasCompleteQuest = true;
+                        return true;
                     }
                 })
             })
         }
-        return hasCompleteQuest;
+        return false;
     }
 
     update(...args: any[]): void {
@@ -172,6 +168,7 @@ export class Npc extends Phaser.Physics.Arcade.Sprite {
         if (this.unsubscribe) {
             this.unsubscribe();
         }
+        super.destroy();
     }
 
 }

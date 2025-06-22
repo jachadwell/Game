@@ -5,7 +5,7 @@ export default class Preloader extends Scene {
         super("Preloader");
     }
 
-    init() {}
+    init() { }
 
     preload() {
         //  Load the assets for the game - Replace with your own assets
@@ -83,6 +83,10 @@ export default class Preloader extends Scene {
         this.load.tilemapTiledJSON(
             "basic-house-two-interrior",
             "BasicHouse/Basic-House-Interrior2.json"
+        );
+        this.load.tilemapTiledJSON(
+            "arena",
+            "BasicHouse/Arena.json"
         );
     }
 

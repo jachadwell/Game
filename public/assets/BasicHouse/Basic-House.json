@@ -868,7 +868,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],
@@ -911,7 +911,7 @@
         {
          "columns":32,
          "firstgid":2,
-         "image":"..\/..\/..\/..\/houses.png",
+         "image":"..\/houses.png",
          "imageheight":1024,
          "imagewidth":1024,
          "margin":0,

@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { EventBus } from "../EventBus";
 import { Player } from "./Player";
 import { getObjectCustomPropertyValue } from "../Classes/SceneLoader";
+import { TInventoryItem } from "../Types/types";
 
 type EnemyConfig = {
     scene: Phaser.Scene;
@@ -16,6 +17,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     private id: string;
     private bar: Phaser.GameObjects.Graphics;
     private moveEvent;
+    private inventory: TInventoryItem[];
+    private player: Player;
 
     constructor(config: EnemyConfig) {
         const { scene, player, gameobject } = config;
@@ -25,6 +28,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         // this.scene = scene;
         this.gameobject = gameobject;
         this.id = getObjectCustomPropertyValue(gameobject, "enemyId");
+        this.inventory = [{ name: "mushroom steak", quantity: 3 }]
+        this.player = player;
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
@@ -73,19 +78,33 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         });
 
         this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains)
-            .on("pointerdown", () => {})
+            .on("pointerdown", () => { })
             .on("pointerover", () => {
-                scene.input.setDefaultCursor("pointer");
+                const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y)
+                if (distance <= 60) {
+                    scene.input.setDefaultCursor("pointer");
+                }
             })
             .on("pointerout", () => {
                 scene.input.setDefaultCursor("default");
+            })
+            .on("pointerdown", (pointer: any) => {
+                const distance = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y)
+                if (distance <= 60) {
+                    if (this.health <= 0) {
+                        EventBus.emit("show-object-inventory", {
+                            x: pointer.x,
+                            y: pointer.y,
+                            object: {
+                                id: this.id,
+                                inventory: this.inventory,
+                            },
+                        });
+                        return;
+                    }
+                    this.updateHealth(-player.stats.damage);
+                }
             });
-
-        EventBus.on(this.id, (action: string, damage: number) => {
-            if (action === "attack") {
-                this.updateHealth(-damage);
-            }
-        });
     }
 
     update() {
@@ -116,7 +135,6 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
 
         this.play("mushroom-die", true);
         setTimeout(() => super.destroy(), 10000);
-        // super.destroy();
     }
 
     drawHealth() {
@@ -146,6 +164,9 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     updateHealth(amount: number) {
+        if (this.health <= 0) {
+            return;
+        }
         if (this.health + amount <= 0) {
             this.health = 0;
             this.destroy();
