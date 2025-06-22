@@ -1,0 +1,28 @@
+{
+    "objects": {
+        "chest1": {
+            "inventory": [
+                {
+                    "name": "gold",
+                    "quantity": 5
+                },
+                {
+                    "name": "stick",
+                    "quantity": 1
+                }
+            ]
+        }
+    },
+    "npcs": {
+        "character1": {
+            "quests": [
+                "1"
+            ]
+        },
+        "character3": {
+            "quests": [
+                "2"
+            ]
+        }
+    }
+}

@@ -1,80 +1,119 @@
-import { forwardRef, useEffect, useLayoutEffect, useRef } from 'react';
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import StartGame from './game/main';
 import { EventBus } from './game/EventBus';
+import Inventory from './components/Inventory';
+import ObjectInventory from './components/ObjectInventory';
+import Dialog from './components/Dialog';
+import QuestLog from './components/QuestLog';
 
-export interface IRefPhaserGame
-{
+export interface IRefPhaserGame {
     game: Phaser.Game | null;
     scene: Phaser.Scene | null;
 }
 
-interface IProps
-{
+interface IProps {
     currentActiveScene?: (scene_instance: Phaser.Scene) => void
 }
 
-export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene }, ref)
-{
+export const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame({ currentActiveScene }, ref) {
     const game = useRef<Phaser.Game | null>(null!);
 
-    useLayoutEffect(() =>
-    {
-        if (game.current === null)
-        {
+    const [showInventory, setShowInventory] = useState<boolean>(false);
+    const [showDialog, setShowDialog] = useState<boolean>(false);
+    const [dialog, setDialog] = useState<string>("");
+    const [hasReadyQuest, setHasReadyQuest] = useState<boolean>(false);
+    const [readyQuestId, setReadyQuestId] = useState<string | null>(null);
+    const [hasCompleteQuest, setHasCompleteQuest] = useState<boolean>(false);
+
+    useLayoutEffect(() => {
+        if (game.current === null) {
 
             game.current = StartGame("game-container");
 
-            if (typeof ref === 'function')
-            {
+            if (typeof ref === 'function') {
                 ref({ game: game.current, scene: null });
-            } else if (ref)
-            {
+            } else if (ref) {
                 ref.current = { game: game.current, scene: null };
             }
 
         }
 
-        return () =>
-        {
-            if (game.current)
-            {
+        return () => {
+            if (game.current) {
                 game.current.destroy(true);
-                if (game.current !== null)
-                {
+                if (game.current !== null) {
                     game.current = null;
                 }
             }
         }
     }, [ref]);
 
-    useEffect(() =>
-    {
-        EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) =>
-        {
-            if (currentActiveScene && typeof currentActiveScene === 'function')
-            {
+    useEffect(() => {
+        EventBus.on('current-scene-ready', (scene_instance: Phaser.Scene) => {
+            if (currentActiveScene && typeof currentActiveScene === 'function') {
 
                 currentActiveScene(scene_instance);
 
             }
 
-            if (typeof ref === 'function')
-            {
+            if (typeof ref === 'function') {
                 ref({ game: game.current, scene: scene_instance });
-            } else if (ref)
-            {
+            } else if (ref) {
                 ref.current = { game: game.current, scene: scene_instance };
             }
-            
+
         });
-        return () =>
-        {
+        return () => {
             EventBus.removeListener('current-scene-ready');
         }
     }, [currentActiveScene, ref]);
 
+    useEffect(() => {
+        const toggleInventory = () => setShowInventory((showInventory) => !showInventory)
+        EventBus.on("toggle-inventory", toggleInventory)
+        return () => {
+            EventBus.off("toggle-inventory", toggleInventory);
+        };
+    })
+
+    useEffect(() => {
+        const toggleDialog = (data: { dialog?: string, hasReadyQuest?: boolean, readyQuestId?: string | undefined, hasCompleteQuest?: boolean }) => {
+            setShowDialog((showDialog) => !showDialog)
+            setDialog(data.dialog ?? "")
+            setHasReadyQuest(data.hasReadyQuest ?? false)
+            setHasCompleteQuest(data.hasCompleteQuest ?? false);
+            setReadyQuestId(data.readyQuestId ?? null)
+        }
+        const toggleDialogOff = () => {
+            setShowDialog(false);
+            setHasReadyQuest(false);
+            setHasCompleteQuest(false);
+        };
+        EventBus.on("toggle-dialog", toggleDialog)
+        EventBus.on('toggle-dialog-off', toggleDialogOff)
+        return () => {
+            EventBus.off("toggle-dialog", toggleDialog);
+            EventBus.off("toggle-dialog-off", toggleDialogOff);
+        };
+    })
+
     return (
-        <div id="game-container"></div>
+        <>
+            <QuestLog />
+            {showInventory && (
+                <Inventory />
+            )}
+            {showDialog && (
+                <Dialog
+                    dialog={dialog}
+                    hasReadyQuest={hasReadyQuest}
+                    readyQuestId={readyQuestId}
+                    hasCompleteQuest={hasCompleteQuest}
+                />
+            )}
+            <ObjectInventory />
+            <div id="game-container"></div>
+        </>
     );
 
 });

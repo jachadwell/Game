@@ -27,9 +27,14 @@
         "build-nolog": "vite build --config vite/config.prod.mjs"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.0",
+        "@mui/material": "^7.1.0",
+        "@reduxjs/toolkit": "^2.8.2",
         "phaser": "^3.88.2",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0"
+        "react-dom": "^19.0.0",
+        "react-redux": "^9.2.0"
     },
     "devDependencies": {
         "@eslint/js": "^9.22.0",
@@ -40,9 +45,9 @@
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-react-refresh": "^0.4.19",
         "globals": "^16.0.0",
+        "terser": "^5.28.1",
         "typescript": "~5.7.2",
         "typescript-eslint": "^8.26.1",
-        "vite": "^6.3.1",
-        "terser": "^5.28.1"
+        "vite": "^6.3.1"
     }
 }

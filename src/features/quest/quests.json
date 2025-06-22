@@ -1,0 +1,30 @@
+{
+    "quests": {
+        "1": {
+            "id": "1",
+            "title": "Hello world",
+            "requirements": {
+                "items": [
+                    {
+                        "name": "stick",
+                        "quantity": 3
+                    }
+                ]
+            },
+            "status": "idle"
+        },
+        "2": {
+            "id": "2",
+            "title": "Combat",
+            "requirements": {
+                "items": [
+                    {
+                        "name": "slimeBall",
+                        "quantity": 10
+                    }
+                ]
+            },
+            "status": "idle"
+        }
+    }
+}

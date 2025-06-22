@@ -1,0 +1,15 @@
+
+Villager 1:
+(front of first house)
+
+Villager 2:
+(Lower left wheat field)
+
+Villager 3:
+(right wheat field)
+Prerequisites: None
+Name: Where the hos at?
+Dialog: I've been tilling these dirt patches with a broken shovel because I can't find where
+        I left mine. If you happen to see my ho laying around can you please bring it to me?
+Requirements: Villagers ho (special item for this quest)
+Rewards: ?
